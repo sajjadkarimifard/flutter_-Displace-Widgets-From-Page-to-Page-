@@ -39,6 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: ListView.builder(
         itemCount: pepole.length,
         itemBuilder: (BuildContext context, int index) {
+          var person = pepole[index];
           return ListTile(
             onTap: () {
               Navigator.push(context, MaterialPageRoute(
@@ -48,9 +49,35 @@ class _HomeScreenState extends State<HomeScreen> {
               ));
             },
             isThreeLine: true,
-            leading: Text(
-              pepole[index].emoji,
-              style: const TextStyle(fontSize: 30),
+            leading: Hero(
+              //your Hero child should wrap whith material. because when you use Hero Widget by it self it shows an yellow line under the widget some times
+              flightShuttleBuilder: (flightContext, animation, flightDirection,
+                  fromHeroContext, toHeroContext) {
+                switch (flightDirection) {
+                  case HeroFlightDirection.push:
+                    return Material(
+                      color: Colors.transparent,
+                      child: ScaleTransition(
+                        scale: animation.drive(
+                          Tween<double>(begin: 0, end: 1).chain(
+                            CurveTween(curve: Curves.fastOutSlowIn),
+                          ),
+                        ),
+                        child: toHeroContext.widget,
+                      ),
+                    );
+                  case HeroFlightDirection.pop:
+                    return Material(
+                      color: Colors.transparent,
+                      child: fromHeroContext.widget,
+                    );
+                }
+              },
+              tag: person.emoji,
+              child: Text(
+                pepole[index].emoji,
+                style: const TextStyle(fontSize: 30),
+              ),
             ),
             title: Text(
               pepole[index].name,
@@ -58,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             subtitle: Text(
               '${pepole[index].age}  years old',
-              style: TextStyle(fontSize: 15),
+              style: const TextStyle(fontSize: 15),
             ),
             trailing: IconButton(
               onPressed: () {},
@@ -94,9 +121,12 @@ class DetailsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         elevation: 4,
-        title: Text(
-          person.emoji,
-          style: const TextStyle(fontSize: 30),
+        title: Hero(
+          tag: person.emoji,
+          child: Text(
+            person.emoji,
+            style: const TextStyle(fontSize: 30),
+          ),
         ),
         centerTitle: true,
       ),
